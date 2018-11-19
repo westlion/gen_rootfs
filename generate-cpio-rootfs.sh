@@ -61,6 +61,12 @@ arm-linux-gnueabihf)
     LIBCBASE=$(dirname $(${CROSS_COMPILE}gcc -print-file-name=ld-linux-armhf.so.3))/..
     export ARCH=arm
     ;;
+#wen-s 这里是针对arm-linux-gnueabi-（32位arm体系架构）建立的依赖库路径
+arm-linux-gnueabi)
+    LIBCBASE=$(dirname $(${CROSS_COMPILE}gcc -print-file-name=ld-linux.so.3))/../..
+    export ARCH=arm
+    ;;
+#wen-e
 *)
     echo "Unsupported arch"
     exit 1
@@ -188,7 +194,9 @@ mkdir -p ${STAGEDIR}/etc/udhcp
 # For using the git version
 cd ${BUSYBOXDIR}
 if [ ! -e ${BUILDDIR}/.config ]; then
-  make O=${BUILDDIR} defconfig
+  #下面这行里原本是defconfig，为了不与自己添加完新命令选项后.config里的选项发生冲突，特意根据新的.config，在busybox/configs/目录下做成一份wen_defconfig
+  make O=${BUILDDIR} wen_defconfig #wen-i
+  #make O=${BUILDDIR} defconfig
   echo "Configuring cross compiler etc..."
   # Comment in this line to create a statically linked busybox
   #sed -i "s/^#.*CONFIG_STATIC.*/CONFIG_STATIC=y/" ${BUILDDIR}/.config
@@ -303,4 +311,3 @@ if [ "$2" != "nocpio" ]; then
         echo "New rootfs ready in ${OUTFILE}"
     fi
 fi
-
